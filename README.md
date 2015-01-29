@@ -16,13 +16,13 @@ if that number is greater than zero.
 Glossary
 --------
 
-`↓ n` n commits behind
-`↑ n` n commits ahead
-`● n` n staged files
-`✖ n` n unmerged files (conflicts)
-`✚ n` n changed files
-`… n` n untracked files
-`⚑ n` n stashed files
+- `↓ n` n commits behind
+- `↑ n` n commits ahead
+- `● n` n staged files
+- `✖ n` n unmerged files (conflicts)
+- `✚ n` n changed files
+- `… n` n untracked files
+- `⚑ n` n stashed files
 
 Installation
 ------------
