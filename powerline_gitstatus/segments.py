@@ -113,7 +113,7 @@ class GitStatusSegment(Segment):
         return self.build_segments(branch, detached, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
 
-powerline_gitstatus = with_docstring(GitStatusSegment(),
+gitstatus = with_docstring(GitStatusSegment(),
 '''Return the status of a Git working copy.
 
 It will show the branch-name, or the commit hash if in detached head state.

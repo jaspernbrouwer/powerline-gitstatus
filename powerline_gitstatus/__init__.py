@@ -1,1 +1,1 @@
-from .segments import powerline_gitstatus
+from .segments import gitstatus
