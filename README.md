@@ -1,7 +1,7 @@
-Powerline GitStatus
+Powerline Gitstatus
 ===================
 
-A [Powerline][1] segment for showing the status of a Git working copy
+A [Powerline][1] segment for showing the status of a Git working copy.
 
 By [Jasper N. Brouwer][2].
 
