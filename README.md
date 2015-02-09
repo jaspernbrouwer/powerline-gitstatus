@@ -15,14 +15,14 @@ if that number is greater than zero.
 
 Glossary
 --------
-
-- `↓ n` n commits behind
-- `↑ n` n commits ahead
-- `● n` n staged files
-- `✖ n` n unmerged files (conflicts)
-- `✚ n` n changed files
-- `… n` n untracked files
-- `⚑ n` n stashed files
+- ``: branch name or commit hash
+- `↓`: n commits behind
+- `↑`: n commits ahead
+- `●`: n staged files
+- `✖`: n unmerged files (conflicts)
+- `✚`: n changed files
+- `…`: n untracked files
+- `⚑`: n stashed files
 
 Installation
 ------------
