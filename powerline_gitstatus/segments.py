@@ -95,7 +95,7 @@ class GitStatusSegment(Segment):
 
         status, err = self.execute(['git', 'status', '--branch', '--porcelain'])
 
-        if 'error' in err or 'fatal' in err:
+        if err and ('error' in err[0] or 'fatal' in err[0]):
             return
 
         branch, detached, behind, ahead = self.parse_branch(status.pop(0))
