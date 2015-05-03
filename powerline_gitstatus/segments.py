@@ -3,6 +3,7 @@
 from powerline.segments import Segment, with_docstring
 from powerline.theme import requires_segment_info
 from subprocess import PIPE, Popen
+import os
 import re
 
 
@@ -11,11 +12,17 @@ class GitStatusSegment(Segment):
 
     @staticmethod
     def get_directory(segment_info):
-        return segment_info['getcwd']()
+        cwd = segment_info['getcwd']()
+
+        if not os.path.isdir('%s/.git' % cwd):
+            return None
+
+        return cwd
 
     def execute(self, command):
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
+
         return (out.decode('utf-8').splitlines(), err.decode('utf-8').splitlines())
 
     def parse_branch(self, line):
@@ -89,11 +96,13 @@ class GitStatusSegment(Segment):
         return segments
 
     def __call__(self, pl, segment_info):
-        name = self.get_directory(segment_info)
-        if not name:
+        cwd = self.get_directory(segment_info)
+        if not cwd:
             return
 
-        status, err = self.execute(['git', 'status', '--branch', '--porcelain'])
+        base_command = ['git', '--git-dir=%s/.git' % cwd, '--work-tree=%s' % cwd]
+
+        status, err = self.execute(base_command + ['status', '--branch', '--porcelain'])
 
         if err and ('error' in err[0] or 'fatal' in err[0]):
             return
@@ -104,11 +113,11 @@ class GitStatusSegment(Segment):
             return
 
         if branch == 'HEAD':
-            branch = self.execute(['git', 'rev-parse', '--short', 'HEAD'])[0][0]
+            branch = self.execute(base_command + ['rev-parse', '--short', 'HEAD'])[0][0]
 
         staged, unmerged, changed, untracked = self.parse_status(status)
 
-        stashed = len(self.execute(['git', 'stash', 'list', '--no-decorate'])[0])
+        stashed = len(self.execute(base_command + ['stash', 'list', '--no-decorate'])[0])
 
         return self.build_segments(branch, detached, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
