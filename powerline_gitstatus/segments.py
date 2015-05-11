@@ -3,27 +3,30 @@
 from powerline.segments import Segment, with_docstring
 from powerline.theme import requires_segment_info
 from subprocess import PIPE, Popen
-import os
 import re
 
 
 @requires_segment_info
 class GitStatusSegment(Segment):
 
-    @staticmethod
-    def get_directory(segment_info):
-        cwd = segment_info['getcwd']()
-
-        if not os.path.isdir('%s/.git' % cwd):
-            return None
-
-        return cwd
-
     def execute(self, command):
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
 
         return (out.decode('utf-8').splitlines(), err.decode('utf-8').splitlines())
+
+    def get_git_toplevel(self, segment_info):
+        cwd = segment_info['getcwd']()
+
+        if not cwd:
+            return None
+
+        toplevel, err = self.execute(['git', 'rev-parse', '--show-toplevel'])
+
+        if err and ('error' in err[0] or 'fatal' in err[0]):
+            return None
+
+        return toplevel[0]
 
     def parse_branch(self, line):
         if not line:
@@ -96,16 +99,14 @@ class GitStatusSegment(Segment):
         return segments
 
     def __call__(self, pl, segment_info):
-        cwd = self.get_directory(segment_info)
-        if not cwd:
+        toplevel = self.get_git_toplevel(segment_info)
+
+        if not toplevel:
             return
 
-        base_command = ['git', '--git-dir=%s/.git' % cwd, '--work-tree=%s' % cwd]
+        base_command = ['git', '--git-dir=%s/.git' % toplevel, '--work-tree=%s' % toplevel]
 
         status, err = self.execute(base_command + ['status', '--branch', '--porcelain'])
-
-        if err and ('error' in err[0] or 'fatal' in err[0]):
-            return
 
         branch, detached, behind, ahead = self.parse_branch(status.pop(0))
 
