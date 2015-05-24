@@ -9,19 +9,29 @@ import re
 @requires_segment_info
 class GitStatusSegment(Segment):
 
-    def execute(self, command):
+    def execute(self, command, pl):
+        pl.debug('Executing command: %s' % ' '.join(command))
+
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
 
+        if out:
+            pl.debug('Command output: %s' % out)
+        if err:
+            pl.debug('Command errors: %s' % err)
+
         return (out.decode('utf-8').splitlines(), err.decode('utf-8').splitlines())
 
-    def get_git_toplevel(self, segment_info):
+    def get_git_toplevel(self, segment_info, pl):
         cwd = segment_info['getcwd']()
 
         if not cwd:
+            pl.debug('Not in a working directory')
             return None
 
-        toplevel, err = self.execute(['git', 'rev-parse', '--show-toplevel'])
+        pl.debug('Current working directory: %s' % cwd)
+
+        toplevel, err = self.execute(['git', 'rev-parse', '--show-toplevel'], pl)
 
         if err and ('error' in err[0] or 'fatal' in err[0]):
             return None
@@ -99,14 +109,14 @@ class GitStatusSegment(Segment):
         return segments
 
     def __call__(self, pl, segment_info):
-        toplevel = self.get_git_toplevel(segment_info)
+        toplevel = self.get_git_toplevel(segment_info, pl)
 
         if not toplevel:
             return
 
         base_command = ['git', '--git-dir=%s/.git' % toplevel, '--work-tree=%s' % toplevel]
 
-        status, err = self.execute(base_command + ['status', '--branch', '--porcelain'])
+        status, err = self.execute(base_command + ['status', '--branch', '--porcelain'], pl)
 
         branch, detached, behind, ahead = self.parse_branch(status.pop(0))
 
@@ -114,11 +124,11 @@ class GitStatusSegment(Segment):
             return
 
         if branch == 'HEAD':
-            branch = self.execute(base_command + ['rev-parse', '--short', 'HEAD'])[0][0]
+            branch = self.execute(base_command + ['rev-parse', '--short', 'HEAD'], pl)[0][0]
 
         staged, unmerged, changed, untracked = self.parse_status(status)
 
-        stashed = len(self.execute(base_command + ['stash', 'list', '--no-decorate'])[0])
+        stashed = len(self.execute(base_command + ['stash', 'list', '--no-decorate'], pl)[0])
 
         return self.build_segments(branch, detached, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
