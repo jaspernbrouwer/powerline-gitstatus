@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name         = 'powerline-gitstatus',
     description  = 'A Powerline segment for showing the status of a Git working copy',
-    version      = '1.0.4',
+    version      = '1.1.0',
     keywords     = 'powerline git status prompt',
     license      = 'MIT',
     author       = 'Jasper N. Brouwer',

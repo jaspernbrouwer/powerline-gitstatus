@@ -24,6 +24,13 @@ Glossary
 - `…`: n untracked files
 - `⚑`: n stashed files
 
+Requirements
+------------
+
+The Gitstatus segment requires [git][5]! Preferably, but not limited to, version 1.8.5 or higher.
+
+Version 1.8.5 will enable the usage of the `-C` parameter, which is more performant and accurate.
+
 Installation
 ------------
 
@@ -52,13 +59,26 @@ for example in `.config/powerline/colorschemes/default.json`:
 "gitstatus:divider":         { "fg": "gray8",           "bg": "gray2", "attrs": [] }
 ```
 
-Finally you can activate the Gitstatus segment by adding it to your segment configuration,
+Then you can activate the Gitstatus segment by adding it to your segment configuration,
 for example in `.config/powerline/themes/shell/default.json`:
 
 ```json
 {
     "function": "powerline_gitstatus.gitstatus",
     "priority": 40
+}
+```
+
+The Gitstatus segment will use the `-C` argument by default, but this requires git 1.8.5 or higher.
+
+If you cannot meet that requirement, you'll have to disable the usage of `-C`.
+Do this by passing `false` to the `use_dash_c` argument, for example in `.config/powerline/themes/shell/__main__.json`:
+
+```json
+"gitstatus": {
+    "args": {
+        "use_dash_c": false
+    }
 }
 ```
 
@@ -71,3 +91,4 @@ Licensed under [the MIT License][3].
 [2]: https://github.com/jaspernbrouwer
 [3]: https://github.com/jaspernbrouwer/powerline-gitstatus/blob/master/LICENSE
 [4]: https://github.com/jaspernbrouwer/powerline-gitstatus/blob/master/screenshot.png
+[5]: https://git-scm.com/

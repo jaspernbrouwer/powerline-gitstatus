@@ -3,40 +3,38 @@
 from powerline.segments import Segment, with_docstring
 from powerline.theme import requires_segment_info
 from subprocess import PIPE, Popen
-import re
+import os, re, string
 
 
 @requires_segment_info
 class GitStatusSegment(Segment):
 
-    def execute(self, command, pl):
+    def execute(self, pl, command):
         pl.debug('Executing command: %s' % ' '.join(command))
 
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
         out, err = proc.communicate()
 
         if out:
-            pl.debug('Command output: %s' % out)
+            pl.debug('Command output: %s' % out.strip(string.whitespace))
         if err:
-            pl.debug('Command errors: %s' % err)
+            pl.debug('Command errors: %s' % err.strip(string.whitespace))
 
         return (out.decode('utf-8').splitlines(), err.decode('utf-8').splitlines())
 
-    def get_git_toplevel(self, segment_info, pl):
-        cwd = segment_info['getcwd']()
+    def get_base_command(self, cwd, use_dash_c):
+        if use_dash_c:
+            return ['git', '-C', cwd]
 
-        if not cwd:
-            pl.debug('Not in a working directory')
-            return None
+        while cwd and cwd != os.sep:
+            gitdir = os.path.join(cwd, '.git')
 
-        pl.debug('Current working directory: %s' % cwd)
+            if os.path.isdir(gitdir):
+                return ['git', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
 
-        toplevel, err = self.execute(['git', 'rev-parse', '--show-toplevel'], pl)
+            cwd = os.path.dirname(cwd)
 
-        if err and ('error' in err[0] or 'fatal' in err[0]):
-            return None
-
-        return toplevel[0]
+        return None
 
     def parse_branch(self, line):
         if not line:
@@ -108,15 +106,23 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info):
-        toplevel = self.get_git_toplevel(segment_info, pl)
+    def __call__(self, pl, segment_info, use_dash_c=True):
+        pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
-        if not toplevel:
+        cwd = segment_info['getcwd']()
+
+        if not cwd:
             return
 
-        base_command = ['git', '--git-dir=%s/.git' % toplevel, '--work-tree=%s' % toplevel]
+        base = self.get_base_command(cwd, use_dash_c)
 
-        status, err = self.execute(base_command + ['status', '--branch', '--porcelain'], pl)
+        if not base:
+            return
+
+        status, err = self.execute(pl, base + ['status', '--branch', '--porcelain'])
+
+        if err and ('error' in err[0] or 'fatal' in err[0]):
+            return
 
         branch, detached, behind, ahead = self.parse_branch(status.pop(0))
 
@@ -124,11 +130,11 @@ class GitStatusSegment(Segment):
             return
 
         if branch == 'HEAD':
-            branch = self.execute(base_command + ['rev-parse', '--short', 'HEAD'], pl)[0][0]
+            branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
 
         staged, unmerged, changed, untracked = self.parse_status(status)
 
-        stashed = len(self.execute(base_command + ['stash', 'list', '--no-decorate'], pl)[0])
+        stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
         return self.build_segments(branch, detached, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
@@ -142,5 +148,12 @@ It will also show the number of commits behind, commits ahead, staged files,
 unmerged files (conflicts), changed files, untracked files and stashed files
 if that number is greater than zero.
 
-Highlight groups used: ``gitstatus_branch_detached``, ``gitstatus_branch_dirty``, ``gitstatus_branch_clean``, ``gitstatus_branch``, ``gitstatus_behind``, ``gitstatus_ahead``, ``gitstatus_staged``, ``gitstatus_unmerged``, ``gitstatus_changed``, ``gitstatus_untracked``, ``gitstatus_stashed``, ``gitstatus``, ``gitstatus:divider``
+:param bool use_dash_c:
+    Call git with ``-C``, which is more performant and accurate, but requires git 1.8.5 or higher.
+    Otherwise it will traverse the current working directory up towards the root until it finds a ``.git`` directory, then use ``--git-dir`` and ``--work-tree``.
+    True by default.
+
+Divider highlight group used: ``gitstatus:divider``.
+
+Highlight groups used: ``gitstatus_branch_detached``, ``gitstatus_branch_dirty``, ``gitstatus_branch_clean``, ``gitstatus_branch``, ``gitstatus_behind``, ``gitstatus_ahead``, ``gitstatus_staged``, ``gitstatus_unmerged``, ``gitstatus_changed``, ``gitstatus_untracked``, ``gitstatus_stashed``, ``gitstatus``.
 ''')
