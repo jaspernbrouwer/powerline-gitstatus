@@ -65,7 +65,7 @@ for example in `.config/powerline/themes/shell/default.json`:
 License
 -------
 
-Lincensed under [the MIT License][3].
+Licensed under [the MIT License][3].
 
 [1]: https://powerline.readthedocs.org/en/master/
 [2]: https://github.com/jaspernbrouwer
