@@ -13,14 +13,14 @@ class GitStatusSegment(Segment):
         pl.debug('Executing command: %s' % ' '.join(command))
 
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
-        out, err = proc.communicate()
+        out, err = [item.decode('utf-8') for item in proc.communicate()]
 
         if out:
             pl.debug('Command output: %s' % out.strip(string.whitespace))
         if err:
             pl.debug('Command errors: %s' % err.strip(string.whitespace))
 
-        return (out.decode('utf-8').splitlines(), err.decode('utf-8').splitlines())
+        return (out.splitlines(), err.splitlines())
 
     def get_base_command(self, cwd, use_dash_c):
         if use_dash_c:
