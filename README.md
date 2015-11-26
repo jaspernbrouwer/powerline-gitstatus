@@ -55,7 +55,7 @@ for example in `.config/powerline/colorschemes/default.json`:
 "gitstatus_unmerged":        { "fg": "brightred",       "bg": "gray2", "attrs": [] },
 "gitstatus_changed":         { "fg": "mediumorange",    "bg": "gray2", "attrs": [] },
 "gitstatus_untracked":       { "fg": "brightestorange", "bg": "gray2", "attrs": [] },
-"gitstatus_stashed":         { "fg": "darkblue",        "bg": "gray2", "attrs": [] }
+"gitstatus_stashed":         { "fg": "darkblue",        "bg": "gray2", "attrs": [] },
 "gitstatus:divider":         { "fg": "gray8",           "bg": "gray2", "attrs": [] }
 ```
 
