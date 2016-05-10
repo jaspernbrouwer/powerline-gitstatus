@@ -77,7 +77,7 @@ class GitStatusSegment(Segment):
 
         return (staged, unmerged, changed, untracked)
 
-    def build_segments(self, branch, detached, behind, ahead, staged, unmerged, changed, untracked, stashed):
+    def build_segments(self, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
         if detached:
             branch_group = 'gitstatus_branch_detached'
         elif staged or unmerged or changed or untracked:
@@ -89,6 +89,8 @@ class GitStatusSegment(Segment):
             {'contents': u'\ue0a0 %s' % branch, 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'}
         ]
 
+        if tag:
+            segments.append({'contents': u' \u2605 %s' % tag, 'highlight_groups': ['gitstatus_tag', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if behind:
             segments.append({'contents': ' ↓ %d' % behind, 'highlight_groups': ['gitstatus_behind', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if ahead:
@@ -106,7 +108,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -136,7 +138,17 @@ class GitStatusSegment(Segment):
 
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
-        return self.build_segments(branch, detached, behind, ahead, staged, unmerged, changed, untracked, stashed)
+        if show_tag:
+            tag, err = self.execute(pl, base + ['describe', '--tags', '--abbrev=0'])
+
+            if err and ('error' in err[0] or 'fatal' in err[0]):
+                tag = ''
+            else:
+                tag = tag[0]
+        else:
+            tag = ''
+
+        return self.build_segments(branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
 
 gitstatus = with_docstring(GitStatusSegment(),
@@ -153,7 +165,11 @@ if that number is greater than zero.
     Otherwise it will traverse the current working directory up towards the root until it finds a ``.git`` directory, then use ``--git-dir`` and ``--work-tree``.
     True by default.
 
+:param bool show_tag:
+    Show the most recent tag reachable in the current branch.
+    False by default, because it needs to execute git an additional time.
+
 Divider highlight group used: ``gitstatus:divider``.
 
-Highlight groups used: ``gitstatus_branch_detached``, ``gitstatus_branch_dirty``, ``gitstatus_branch_clean``, ``gitstatus_branch``, ``gitstatus_behind``, ``gitstatus_ahead``, ``gitstatus_staged``, ``gitstatus_unmerged``, ``gitstatus_changed``, ``gitstatus_untracked``, ``gitstatus_stashed``, ``gitstatus``.
+Highlight groups used: ``gitstatus_branch_detached``, ``gitstatus_branch_dirty``, ``gitstatus_branch_clean``, ``gitstatus_branch``, ``gitstatus_tag``, ``gitstatus_behind``, ``gitstatus_ahead``, ``gitstatus_staged``, ``gitstatus_unmerged``, ``gitstatus_changed``, ``gitstatus_untracked``, ``gitstatus_stashed``, ``gitstatus``.
 ''')

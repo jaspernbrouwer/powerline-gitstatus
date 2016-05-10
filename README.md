@@ -16,6 +16,7 @@ if that number is greater than zero.
 Glossary
 --------
 - ``: branch name or commit hash
+- `★`: most recent tag (if enabled)
 - `↓`: n commits behind
 - `↑`: n commits ahead
 - `●`: n staged files
@@ -51,6 +52,7 @@ for example in `.config/powerline/colorschemes/default.json`:
     "gitstatus_branch_clean":    { "fg": "green",           "bg": "gray2", "attrs": [] },
     "gitstatus_branch_dirty":    { "fg": "gray8",           "bg": "gray2", "attrs": [] },
     "gitstatus_branch_detached": { "fg": "mediumpurple",    "bg": "gray2", "attrs": [] },
+    "gitstatus_tag":             { "fg": "darkcyan",        "bg": "gray2", "attrs": [] },
     "gitstatus_behind":          { "fg": "gray10",          "bg": "gray2", "attrs": [] },
     "gitstatus_ahead":           { "fg": "gray10",          "bg": "gray2", "attrs": [] },
     "gitstatus_staged":          { "fg": "green",           "bg": "gray2", "attrs": [] },
@@ -85,6 +87,19 @@ Do this by passing `false` to the `use_dash_c` argument, for example in `.config
     }
 }
 ```
+
+Optionally the most recent tag reachable in the current branch can be shown.
+You can enable this by passing `true` to the `show_tag` argument, for example in `.config/powerline/themes/shell/__main__.json`:
+
+```json
+"gitstatus": {
+    "args": {
+        "show_tag": true
+    }
+}
+```
+
+Git is executed an additional time to find this tag, so it is disabled by default.
 
 License
 -------
