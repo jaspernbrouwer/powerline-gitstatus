@@ -144,6 +144,8 @@ class GitStatusSegment(Segment):
             tag, err = self.execute(pl, base + ['describe', '--contains'])
         elif show_tag == 'branch':
             tag, err = self.execute(pl, base + ['describe', '--contains', '--all'])
+        elif show_tag == 'tag':
+            tag, err = self.execute(pl, base + ['describe', '--tags'])
         elif show_tag == 'describe':
             tag, err = self.execute(pl, base + ['describe'])
         elif show_tag == 'exact': # git-prompt.sh default
