@@ -113,7 +113,7 @@ You can enable this by passing `true` to the `show_tag` argument, for example in
 }
 ```
 
-You can also specify any describe style that `git-prompt.sh` supports (via its `GIT_PS1_DESCRIBE_STYLE`) by passing `"contains"`, `"branch"`, `"describe"` or `"exact"` (which is `git-prompt.sh`'s `"default"`).
+You can also specify any describe style that `git-prompt.sh` supports (via its `GIT_PS1_DESCRIBE_STYLE`) by passing `"contains"`, `"branch"`, `"tag"`, `"describe"` or `"exact"` (which is `git-prompt.sh`'s `"default"`).
 Git is executed an additional time to find this tag, so it is disabled by default.
 
 Optionally the format in which Gitstatus shows information can be customized.
