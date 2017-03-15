@@ -138,15 +138,23 @@ class GitStatusSegment(Segment):
 
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
-        if show_tag:
+        if not show_tag:
+            tag, err = [''], False
+        elif show_tag == 'contains':
+            tag, err = self.execute(pl, base + ['describe', '--contains'])
+        elif show_tag == 'branch':
+            tag, err = self.execute(pl, base + ['describe', '--contains', '--all'])
+        elif show_tag == 'describe':
+            tag, err = self.execute(pl, base + ['describe'])
+        elif show_tag == 'exact': # git-prompt.sh default
+            tag, err = self.execute(pl, base + ['describe', '--tags', '--exact-match'])
+        else: # old non-False
             tag, err = self.execute(pl, base + ['describe', '--tags', '--abbrev=0'])
 
-            if err and ('error' in err[0] or 'fatal' in err[0]):
-                tag = ''
-            else:
-                tag = tag[0]
-        else:
+        if err and ('error' in err[0] or 'fatal' in err[0]):
             tag = ''
+        else:
+            tag = tag[0]
 
         return self.build_segments(branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
