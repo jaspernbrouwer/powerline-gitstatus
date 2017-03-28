@@ -15,6 +15,7 @@ if that number is greater than zero.
 
 Glossary
 --------
+- `⏳`: in-progress information (if enabled) 
 - ``: branch name or commit hash
 - `★`: most recent tag (if enabled)
 - `↓`: n commits behind
@@ -53,6 +54,7 @@ for example in `.config/powerline/colorschemes/default.json`:
     "gitstatus_branch_dirty":    { "fg": "gray8",           "bg": "gray2", "attrs": [] },
     "gitstatus_branch_detached": { "fg": "mediumpurple",    "bg": "gray2", "attrs": [] },
     "gitstatus_tag":             { "fg": "darkcyan",        "bg": "gray2", "attrs": [] },
+    "gitstatus_inprogress":      { "fg": "red",             "bg": "gray2", "attrs": [] },
     "gitstatus_behind":          { "fg": "gray10",          "bg": "gray2", "attrs": [] },
     "gitstatus_ahead":           { "fg": "gray10",          "bg": "gray2", "attrs": [] },
     "gitstatus_staged":          { "fg": "green",           "bg": "gray2", "attrs": [] },
@@ -101,6 +103,9 @@ You can enable this by passing `true` to the `show_tag` argument, for example in
 
 You can also specify any describe style that `git-prompt.sh` supports (via its `GIT_PS1_DESCRIBE_STYLE`) by passing `"contains"`, `"branch"`, `"tag"`, `"describe"` or `"exact"` (which is `git-prompt.sh`'s `"default"`).
 Git is executed an additional time to find this tag, so it is disabled by default.
+
+Optionally in-progress information can be show (BISECTING, MERGING etc.).
+You can enable this by passing `true` to the `show_inprogress` argument (see above).
 
 License
 -------

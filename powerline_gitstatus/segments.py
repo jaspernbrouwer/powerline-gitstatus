@@ -43,13 +43,18 @@ class GitStatusSegment(Segment):
         if line.startswith('## '):
             line = line[3:]
 
+        try:
+            line, inprogress = line.split('; ', 1)
+        except ValueError:
+            inprogress = False
+
         match = re.search('^Initial commit on (.+)$', line)
         if match is not None:
-            return (match.group(1), False, 0, 0)
+            return (match.group(1), False, 0, 0, inprogress)
 
         match = re.search('^(.+) \(no branch\)$', line)
         if match is not None:
-            return (match.group(1), True, 0, 0)
+            return (match.group(1), True, 0, 0, inprogress)
 
         match = re.search('^(.+?)\.\.\.', line)
         if match is not None:
@@ -57,17 +62,17 @@ class GitStatusSegment(Segment):
 
             match = re.search('\[ahead (\d+), behind (\d+)\]$', line)
             if match is not None:
-                return (branch, False, int(match.group(2)), int(match.group(1)))
+                return (branch, False, int(match.group(2)), int(match.group(1)), inprogress)
             match = re.search('\[ahead (\d+)\]$', line)
             if match is not None:
-                return (branch, False, 0, int(match.group(1)))
+                return (branch, False, 0, int(match.group(1)), inprogress)
             match = re.search('\[behind (\d+)\]$', line)
             if match is not None:
-                return (branch, False, int(match.group(1)), 0)
+                return (branch, False, int(match.group(1)), 0, inprogress)
 
-            return (branch, False, 0, 0)
+            return (branch, False, 0, 0, inprogress)
 
-        return (line, False, 0, 0)
+        return (line, False, 0, 0, inprogress)
 
     def parse_status(self, lines):
         staged    = len([True for l in lines if l[0] in 'MRC' or (l[0] == 'D' and l[1] != 'D') or (l[0] == 'A' and l[1] != 'A')])
@@ -77,7 +82,7 @@ class GitStatusSegment(Segment):
 
         return (staged, unmerged, changed, untracked)
 
-    def build_segments(self, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
+    def build_segments(self, branch, detached, tag, inprogress, behind, ahead, staged, unmerged, changed, untracked, stashed):
         if detached:
             branch_group = 'gitstatus_branch_detached'
         elif staged or unmerged or changed or untracked:
@@ -85,9 +90,12 @@ class GitStatusSegment(Segment):
         else:
             branch_group = 'gitstatus_branch_clean'
 
-        segments = [
-            {'contents': u'\ue0a0 %s' % branch, 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'}
-        ]
+        segments = []
+
+        if inprogress:
+            segments.append({'contents': u'\u23f3 %s ' % inprogress, 'highlight_groups': ['gitstatus_inprogress', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+
+        segments.append({'contents': u'\ue0a0 %s' % branch, 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
 
         if tag:
             segments.append({'contents': u' \u2605 %s' % tag, 'highlight_groups': ['gitstatus_tag', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
@@ -108,7 +116,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, show_inprogress=False):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -121,15 +129,18 @@ class GitStatusSegment(Segment):
         if not base:
             return
 
-        status, err = self.execute(pl, base + ['status', '--branch', '--porcelain'])
+        status, err = self.execute(pl, base + ['status', '--branch', '--inprogress', '--porcelain'])
 
         if err and ('error' in err[0] or 'fatal' in err[0]):
             return
 
-        branch, detached, behind, ahead = self.parse_branch(status.pop(0))
+        branch, detached, behind, ahead, inprogress = self.parse_branch(status.pop(0))
 
         if not branch:
             return
+
+        if not show_inprogress:
+            inprogress = False
 
         if branch == 'HEAD':
             branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
@@ -158,7 +169,7 @@ class GitStatusSegment(Segment):
         else:
             tag = tag[0]
 
-        return self.build_segments(branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
+        return self.build_segments(branch, detached, tag, inprogress, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
 
 gitstatus = with_docstring(GitStatusSegment(),
@@ -178,6 +189,9 @@ if that number is greater than zero.
 :param bool show_tag:
     Show the most recent tag reachable in the current branch.
     False by default, because it needs to execute git an additional time.
+
+:param bool show_inprogress:
+    Show in-progress information (during merge, bisect etc.).
 
 Divider highlight group used: ``gitstatus:divider``.
 
