@@ -108,7 +108,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, show_untracked=True):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, show_stashed=True, show_untracked=True):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -140,7 +140,10 @@ class GitStatusSegment(Segment):
 
         staged, unmerged, changed, untracked = self.parse_status(status)
 
-        stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
+        if show_stashed:
+            stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
+        else:
+            stashed = 0
 
         if show_tag:
             tag, err = self.execute(pl, base + ['describe', '--tags', '--abbrev=0'])
@@ -176,6 +179,10 @@ if that number is greater than zero.
 :param bool show_untracked:
     Show the number of untracked files.
     True by default but may take a long time to compute in large repositories
+
+:param bool show_stashed:
+    Show the number of stashes.
+    True by default.
 
 Divider highlight group used: ``gitstatus:divider``.
 
