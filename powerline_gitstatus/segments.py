@@ -108,7 +108,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, show_untracked=True):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -120,8 +120,12 @@ class GitStatusSegment(Segment):
 
         if not base:
             return
+        status_args = ['status', '--branch', '--porcelain']
+        # finding all untracked files can take a long time
+        if not show_untracked:
+            status_args.append('-uno')
 
-        status, err = self.execute(pl, base + ['status', '--branch', '--porcelain'])
+        status, err = self.execute(pl, base + status_args)
 
         if err and ('error' in err[0] or 'fatal' in err[0]):
             return
@@ -168,6 +172,10 @@ if that number is greater than zero.
 :param bool show_tag:
     Show the most recent tag reachable in the current branch.
     False by default, because it needs to execute git an additional time.
+
+:param bool show_untracked:
+    Show the number of untracked files.
+    True by default but may take a long time to compute in large repositories
 
 Divider highlight group used: ``gitstatus:divider``.
 
