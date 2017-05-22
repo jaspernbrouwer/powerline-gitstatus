@@ -90,21 +90,21 @@ class GitStatusSegment(Segment):
         ]
 
         if tag:
-            segments.append({'contents': u' \u2605 %s' % tag, 'highlight_groups': ['gitstatus_tag', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': u' \u2605%s' % tag, 'highlight_groups': ['gitstatus_tag', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if behind:
-            segments.append({'contents': ' ↓ %d' % behind, 'highlight_groups': ['gitstatus_behind', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' ↓%d' % behind, 'highlight_groups': ['gitstatus_behind', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if ahead:
-            segments.append({'contents': ' ↑ %d' % ahead, 'highlight_groups': ['gitstatus_ahead', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' ↑%d' % ahead, 'highlight_groups': ['gitstatus_ahead', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if staged:
-            segments.append({'contents': ' ● %d' % staged, 'highlight_groups': ['gitstatus_staged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' ●%d' % staged, 'highlight_groups': ['gitstatus_staged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if unmerged:
-            segments.append({'contents': ' ✖ %d' % unmerged, 'highlight_groups': ['gitstatus_unmerged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' ✖%d' % unmerged, 'highlight_groups': ['gitstatus_unmerged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if changed:
-            segments.append({'contents': ' ✚ %d' % changed, 'highlight_groups': ['gitstatus_changed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' ✚%d' % changed, 'highlight_groups': ['gitstatus_changed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if untracked:
-            segments.append({'contents': ' … %d' % untracked, 'highlight_groups': ['gitstatus_untracked', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' …%d' % untracked, 'highlight_groups': ['gitstatus_untracked', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if stashed:
-            segments.append({'contents': ' ⚑ %d' % stashed, 'highlight_groups': ['gitstatus_stashed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': ' ⚑%d' % stashed, 'highlight_groups': ['gitstatus_stashed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
 
         return segments
 
