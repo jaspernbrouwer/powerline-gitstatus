@@ -86,7 +86,7 @@ class GitStatusSegment(Segment):
             branch_group = 'gitstatus_branch_clean'
 
         segments = [
-            {'contents': u'%s\ue0a0' % branch, 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'}
+            {'contents': u'%s \ue0a0' % branch, 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'}
         ]
 
         if tag:
