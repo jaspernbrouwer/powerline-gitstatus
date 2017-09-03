@@ -77,7 +77,7 @@ class GitStatusSegment(Segment):
 
         return (staged, unmerged, changed, untracked)
 
-    def build_segments(self, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
+    def build_segments(self, branch, branch_symbol, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
         if detached:
             branch_group = 'gitstatus_branch_detached'
         elif staged or unmerged or changed or untracked:
@@ -86,7 +86,7 @@ class GitStatusSegment(Segment):
             branch_group = 'gitstatus_branch_clean'
 
         segments = [
-            {'contents': u'\ue0a0 %s' % branch, 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'}
+            {'contents': u'%s %s' % (branch_symbol, branch), 'highlight_groups': [branch_group, 'gitstatus_branch', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'}
         ]
 
         if tag:
@@ -108,7 +108,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, use_powerline_symbols=True):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -134,6 +134,8 @@ class GitStatusSegment(Segment):
         if branch == 'HEAD':
             branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
 
+        branch_symbol = u'\ue0a0' if use_powerline_symbols else u'⎇'
+
         staged, unmerged, changed, untracked = self.parse_status(status)
 
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
@@ -148,7 +150,7 @@ class GitStatusSegment(Segment):
         else:
             tag = ''
 
-        return self.build_segments(branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
+        return self.build_segments(branch, branch_symbol, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
 
 gitstatus = with_docstring(GitStatusSegment(),
@@ -168,6 +170,10 @@ if that number is greater than zero.
 :param bool show_tag:
     Show the most recent tag reachable in the current branch.
     False by default, because it needs to execute git an additional time.
+
+:param bool use_powerline_symbols:
+    Use private symbols found in powerline fonts.
+    True by default, false will use non-private unicode characters instead.
 
 Divider highlight group used: ``gitstatus:divider``.
 
