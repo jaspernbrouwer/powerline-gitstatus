@@ -101,6 +101,17 @@ You can enable this by passing `true` to the `show_tag` argument, for example in
 
 Git is executed an additional time to find this tag, so it is disabled by default.
 
+If you only want to show the tag when it directly references the current commit, please set `tag_exact_match` to `true`:
+
+```json
+"gitstatus": {
+    "args": {
+        "show_tag": true,
+        "tag_exact_match": true
+    }
+}
+```
+
 License
 -------
 
