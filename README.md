@@ -101,6 +101,27 @@ You can enable this by passing `true` to the `show_tag` argument, for example in
 
 Git is executed an additional time to find this tag, so it is disabled by default.
 
+You may also customize Git status labels via the `labels` argument, for example in `.config/powerline/themes/shell/__main__.json`:
+
+```json
+"gitstatus": {
+    "args": {
+        "labels": {
+            "ahead": "AHEAD",
+            "behind": "BEHIND",
+            "branch": "ON",
+            "changed": "*",
+            "staged": "+",
+            "stashed": "STASH",
+            "tag": "AS",
+            "unmerged": "CONFLICT",
+            "untracked": "?"
+    }
+}
+```
+
+This can be useful when you are using a font that doesn't support glyphs chosen in the default labels.
+
 License
 -------
 
