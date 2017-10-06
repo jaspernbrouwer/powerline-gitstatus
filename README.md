@@ -116,6 +116,7 @@ You may also customize Git status labels via the `labels` argument, for example 
             "tag": "AS",
             "unmerged": "CONFLICT",
             "untracked": "?"
+        }
     }
 }
 ```
