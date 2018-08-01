@@ -139,7 +139,10 @@ class GitStatusSegment(Segment):
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
         if show_tag:
-            tag, err = self.execute(pl, base + ['describe', '--tags', '--abbrev=0'] + (['--exact-match'] if tag_exact_match else []))
+            if tag_exact_match:
+                tag, err = self.execute(pl, base + ['tag', '--points-at'])
+            else:
+                tag, err = self.execute(pl, base + ['describe', '--tags', '--abbrev=0'])
 
             if err and ('error' in err[0] or 'fatal' in err[0]):
                 tag = ''
