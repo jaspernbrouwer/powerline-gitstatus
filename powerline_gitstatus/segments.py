@@ -94,7 +94,7 @@ class GitStatusSegment(Segment):
         if behind:
             segments.append({'contents': formats.get('behind', ' ↓ {}').format(behind), 'highlight_groups': ['gitstatus_behind', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if ahead:
-            segments.append({'contents': formats.get('', ' ↑ {}').format(ahead), 'highlight_groups': ['gitstatus_ahead', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('ahead', ' ↑ {}').format(ahead), 'highlight_groups': ['gitstatus_ahead', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if staged:
             segments.append({'contents': formats.get('staged', ' ● {}').format(staged), 'highlight_groups': ['gitstatus_staged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if unmerged:
