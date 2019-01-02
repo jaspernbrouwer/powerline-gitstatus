@@ -35,11 +35,25 @@ Version 1.8.5 will enable the usage of the `-C` parameter, which is more perform
 Installation
 ------------
 
-Installing the Gitstatus segment can be done with pip:
+### On Debian/Ubuntu
+
+```txt
+apt install powerline-gitstatus
+```
+
+This command will also instruct your package manager to install Powerline, if it's not already available.
+
+Powerline will be automatically configured to use the Gitstatus highlight groups and add the segment to the default
+shell theme.
+
+### Using pip
 
 ```txt
 pip install powerline-gitstatus
 ```
+
+Configuration
+-------------
 
 The Gitstatus segment uses a couple of custom highlight groups. You'll need to define those groups in your colorscheme,
 for example in `.config/powerline/colorschemes/default.json`:
