@@ -102,22 +102,24 @@ You can enable this by passing `true` to the `show_tag` argument, for example in
 Git is executed an additional time to find this tag, so it is disabled by default.
 
 Optionally the format in which Gitstatus shows information can be customized.
-This allows to use a different icon or remove a fragment if desired. You can
+This allows to use a different symbol or remove a fragment if desired. You can
 customize string formats for _tag_, _behind_, _ahead_, _staged_, _unmerged_,
 _changed_, _untracked_ and _stash_ fragments with the following arguments in a
 theme configuration file, for example `.config/powerline/themes/shell/__main__.json`:
 
 ```json
 "gitstatus": {
-    "args": {
-        "tag_format": " {}",
-        "behind_format": " {}",
-        "ahead_format": " {}",
-        "staged_format": " {}",
-        "unmerged_format": " {}",
-        "changed_format": " {}",
-        "untracked_format": " {}",
-        "stashed_format": " {}"
+    "args": { 
+        "formats": {
+            "tag": " {}",
+            "behind": " {}",
+            "ahead": " {}",
+            "staged": " {}",
+            "unmerged": " {}",
+            "changed": " {}",
+            "untracked": " {}",
+            "stashed": " {}"
+        }
     }
 }
 ```

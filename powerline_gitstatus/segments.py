@@ -77,7 +77,7 @@ class GitStatusSegment(Segment):
 
         return (staged, unmerged, changed, untracked)
 
-    def build_segments(self, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
+    def build_segments(self, formats, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
         if detached:
             branch_group = 'gitstatus_branch_detached'
         elif staged or unmerged or changed or untracked:
@@ -90,45 +90,26 @@ class GitStatusSegment(Segment):
         ]
 
         if tag:
-            segments.append({'contents': self.tag_format.format(tag), 'highlight_groups': ['gitstatus_tag', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('tag', u' \u2605 {}').format(tag), 'highlight_groups': ['gitstatus_tag', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if behind:
-            segments.append({'contents': self.behind_format.format(behind), 'highlight_groups': ['gitstatus_behind', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('behind', ' ↓ {}').format(behind), 'highlight_groups': ['gitstatus_behind', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if ahead:
-            segments.append({'contents': self.ahead_format.format(ahead), 'highlight_groups': ['gitstatus_ahead', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('', ' ↑ {}').format(ahead), 'highlight_groups': ['gitstatus_ahead', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if staged:
-            segments.append({'contents': self.staged_format.format(staged), 'highlight_groups': ['gitstatus_staged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('staged', ' ● {}').format(staged), 'highlight_groups': ['gitstatus_staged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if unmerged:
-            segments.append({'contents': self.unmerged_format.format(unmerged), 'highlight_groups': ['gitstatus_unmerged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('unmerged', ' ✖ {}').format(unmerged), 'highlight_groups': ['gitstatus_unmerged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if changed:
-            segments.append({'contents': self.changed_format.format(changed), 'highlight_groups': ['gitstatus_changed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('changed', ' ✚ {}').format(changed), 'highlight_groups': ['gitstatus_changed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if untracked:
-            segments.append({'contents': self.untracked_format.format(untracked), 'highlight_groups': ['gitstatus_untracked', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('untracked', ' … {}').format(untracked), 'highlight_groups': ['gitstatus_untracked', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if stashed:
-            segments.append({'contents': self.stashed_format.format(stashed), 'highlight_groups': ['gitstatus_stashed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('stashed', ' ⚑ {}').format(stashed), 'highlight_groups': ['gitstatus_stashed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
 
         return segments
 
-    def __call__(self, pl, segment_info,
-                 use_dash_c=True,
-                 show_tag=False,
-                 tag_format=u' \u2605 {}',
-                 behind_format=' ↓ {}',
-                 ahead_format=' ↑ {}',
-                 staged_format=' ● {}',
-                 unmerged_format=' ✖ {}',
-                 changed_format=' ✚ {}',
-                 untracked_format=' … {}',
-                 stashed_format=' ⚑ {}'):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
-
-        self.tag_format = tag_format
-        self.behind_format = behind_format
-        self.ahead_format = ahead_format
-        self.staged_format = staged_format
-        self.unmerged_format = unmerged_format
-        self.changed_format = changed_format
-        self.untracked_format = untracked_format
-        self.stashed_format = stashed_format
 
         cwd = segment_info['getcwd']()
 
@@ -167,7 +148,7 @@ class GitStatusSegment(Segment):
         else:
             tag = ''
 
-        return self.build_segments(branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
+        return self.build_segments(formats, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
 
 
 gitstatus = with_docstring(GitStatusSegment(),
@@ -187,6 +168,10 @@ if that number is greater than zero.
 :param bool show_tag:
     Show the most recent tag reachable in the current branch.
     False by default, because it needs to execute git an additional time.
+
+:param dict formats:
+    A string-to-string dictionary for customizing Git status formats. Valid keys include ``branch``, ``tag``, ``ahead``, ``behind``, ``staged``, ``unmerged``, ``changes``, ``untracked``, and ``stashed``.
+    Empty dictionary by default, which means the default formats are used.
 
 Divider highlight group used: ``gitstatus:divider``.
 
