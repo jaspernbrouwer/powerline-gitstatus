@@ -137,7 +137,7 @@ class GitStatusSegment(Segment):
         if branch == 'HEAD':
             if detached_head_style == 'revision':
                 branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
-            elif detached_head_style == 'branch':
+            elif detached_head_style == 'ref':
                 branch = self.execute(pl, base + ['describe', '--contains', '--all'])[0][0]
 
         staged, unmerged, changed, untracked = self.parse_status(status)
@@ -186,7 +186,7 @@ if that number is greater than zero.
     Empty dictionary by default, which means the default formats are used.
 
 :param detached_head_style:
-    Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``branch``, which shows the closest reachable branch ref.
+    Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``ref``, which shows the closest reachable ref object.
     The default is ``revision``.
 
 Divider highlight group used: ``gitstatus:divider``.
