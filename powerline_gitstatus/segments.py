@@ -157,7 +157,7 @@ class GitStatusSegment(Segment):
         else:
             tag, err = self.execute(pl, base + ['describe', '--tags', '--exact-match'] + describe_abbrev)
 
-        if err and ('error' in err[0] or 'fatal' in err[0]):
+        if err and ('error' in err[0] or 'fatal' in err[0] or 'Could not get sha1 for HEAD' in err[0]):
             tag = ''
         else:
             tag = tag[0]
