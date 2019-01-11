@@ -108,7 +108,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, tag_long_format=False):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, tag_long_format=False, detached_head_style='revision'):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -132,7 +132,10 @@ class GitStatusSegment(Segment):
             return
 
         if branch == 'HEAD':
-            branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
+            if detached_head_style == 'revision':
+                branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
+            elif detached_head_style == 'branch':
+                branch = self.execute(pl, base + ['describe', '--contains', '--all'])[0][0]
 
         staged, unmerged, changed, untracked = self.parse_status(status)
 
@@ -187,6 +190,10 @@ if that number is greater than zero.
 :param tag_long_format:
     Display the tag using the default describe long format, which includes number of commits and a revision number.
     False by default, which means only the tag is displayed.
+
+:param detached_head_style:
+    Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``branch``, which shows the closest reachable branch ref.
+    The default is ``revision``.
 
 Divider highlight group used: ``gitstatus:divider``.
 
