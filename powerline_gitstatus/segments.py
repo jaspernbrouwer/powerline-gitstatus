@@ -11,8 +11,11 @@ class GitStatusSegment(Segment):
 
     def execute(self, pl, command):
         pl.debug('Executing command: %s' % ' '.join(command))
+	
+        git_env = os.environ.copy()
+        git_env['LC_ALL'] = 'C' 
 
-        proc = Popen(command, stdout=PIPE, stderr=PIPE)
+        proc = Popen(command, stdout=PIPE, stderr=PIPE, env=git_env)
         out, err = [item.decode('utf-8') for item in proc.communicate()]
 
         if out:
