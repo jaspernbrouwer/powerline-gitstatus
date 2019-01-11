@@ -102,22 +102,24 @@ Do this by passing `false` to the `use_dash_c` argument, for example in `.config
 }
 ```
 
-Optionally the most recent tag reachable in the current branch can be shown.
-You can enable this by passing `true` to the `show_tag` argument, for example in `.config/powerline/themes/shell/__main__.json`:
+Optionally, a tag description for the current branch may be displayed using the `show_tag` option. Valid values for this
+argument are:
+ * `last` : shows the most recent tag
+ * `annotated` : shows the most recent annotated tag
+ * `contains` : shows the closest tag that comes after the current commit
+ * `exact` : shows a tag only if it matches the current commit
+You can enable this by passing one of these to the `show_tag` argument, for example in `.config/powerline/themes/shell/__main__.json`:
 
 ```json
 "gitstatus": {
     "args": {
-        "show_tag": true
+        "show_tag": "exact"
     }
 }
 ```
-
-You can also specify any describe style that `git-prompt.sh` supports (via its `GIT_PS1_DESCRIBE_STYLE`) by passing `"contains"`,
-`"branch"`, `"tag"`, `"describe"` or `"exact"` (which is `git-prompt.sh`'s `"default"`). For example, with `"exact"` the tag
-is only shown when it directly references the current checked-out commit.
-
 Git is executed an additional time to find this tag, so it is disabled by default.
+
+Note: before v1.3.0, the behavior when the value is `True` was `last`. As of v1.3.0 onwards, `True` behaves as `exact`.
 
 Optionally the format in which Gitstatus shows information can be customized.
 This allows to use a different symbol or remove a fragment if desired. You can
@@ -142,6 +144,18 @@ theme configuration file, for example `.config/powerline/themes/shell/__main__.j
 }
 ```
 
+By default, when in detached head state (current revision is not a branch tip), Gitstatus shows a short commit hash in
+place of the branch name. This can be replaced with a description of the closest reachable ref using the
+`detached_head_style` argument, for example in `.config/powerline/themes/shell/__main__.json`:
+
+```json
+"gitstatus": {
+    "args": { 
+        "detached_head_style": "ref"
+    }
+}
+```
+ 
 License
 -------
 
