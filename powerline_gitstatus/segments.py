@@ -111,7 +111,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, tag_long_format=False, detached_head_style='revision'):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision'):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -144,21 +144,16 @@ class GitStatusSegment(Segment):
 
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
-        if tag_long_format:
-            describe_abbrev = []
-        else:
-            describe_abbrev = ['--abbrev=0']
-
         if not show_tag:
             tag, err = [''], False
         elif show_tag == 'contains':
-            tag, err = self.execute(pl, base + ['describe', '--contains'] + describe_abbrev)
+            tag, err = self.execute(pl, base + ['describe', '--contains'])
         elif show_tag == 'last':
-            tag, err = self.execute(pl, base + ['describe', '--tags'] + describe_abbrev)
+            tag, err = self.execute(pl, base + ['describe', '--tags'])
         elif show_tag == 'annotated':
-            tag, err = self.execute(pl, base + ['describe'] + describe_abbrev)
+            tag, err = self.execute(pl, base + ['describe'])
         else:
-            tag, err = self.execute(pl, base + ['describe', '--tags', '--exact-match'] + describe_abbrev)
+            tag, err = self.execute(pl, base + ['describe', '--tags', '--exact-match', '--abbrev=0'])
 
         if err and ('error' in err[0] or 'fatal' in err[0] or 'Could not get sha1 for HEAD' in err[0]):
             tag = ''
@@ -189,10 +184,6 @@ if that number is greater than zero.
 :param dict formats:
     A string-to-string dictionary for customizing Git status formats. Valid keys include ``branch``, ``tag``, ``ahead``, ``behind``, ``staged``, ``unmerged``, ``changes``, ``untracked``, and ``stashed``.
     Empty dictionary by default, which means the default formats are used.
-
-:param tag_long_format:
-    Display the tag using the default describe long format, which includes number of commits and a revision number.
-    False by default, which means only the tag is displayed.
 
 :param detached_head_style:
     Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``branch``, which shows the closest reachable branch ref.
