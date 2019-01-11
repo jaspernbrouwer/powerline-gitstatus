@@ -108,7 +108,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, tag_long_format=False):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -138,20 +138,21 @@ class GitStatusSegment(Segment):
 
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
+        if tag_long_format:
+            describe_abbrev = []
+        else:
+            describe_abbrev = ['--abbrev=0']
+
         if not show_tag:
             tag, err = [''], False
         elif show_tag == 'contains':
-            tag, err = self.execute(pl, base + ['describe', '--contains'])
-        elif show_tag == 'branch':
-            tag, err = self.execute(pl, base + ['describe', '--contains', '--all'])
-        elif show_tag == 'tag':
-            tag, err = self.execute(pl, base + ['describe', '--tags'])
-        elif show_tag == 'describe':
-            tag, err = self.execute(pl, base + ['describe'])
-        elif show_tag == 'exact': # git-prompt.sh default
-            tag, err = self.execute(pl, base + ['describe', '--tags', '--exact-match'])
-        else: # old non-False
-            tag, err = self.execute(pl, base + ['describe', '--tags', '--abbrev=0'])
+            tag, err = self.execute(pl, base + ['describe', '--contains'] + describe_abbrev)
+        elif show_tag == 'last':
+            tag, err = self.execute(pl, base + ['describe', '--tags'] + describe_abbrev)
+        elif show_tag == 'annotated':
+            tag, err = self.execute(pl, base + ['describe'] + describe_abbrev)
+        else:
+            tag, err = self.execute(pl, base + ['describe', '--tags', '--exact-match'] + describe_abbrev)
 
         if err and ('error' in err[0] or 'fatal' in err[0]):
             tag = ''
@@ -176,12 +177,16 @@ if that number is greater than zero.
     True by default.
 
 :param bool show_tag:
-    Show the most recent tag reachable in the current branch.
+    Show tag description. Valid options are``contains``, ``last``, ``annotated`` and ``exact``. A value of True behaves the same as ``exact``, which only displays a tag when it's assigned to the currently checked-out revision.
     False by default, because it needs to execute git an additional time.
 
 :param dict formats:
     A string-to-string dictionary for customizing Git status formats. Valid keys include ``branch``, ``tag``, ``ahead``, ``behind``, ``staged``, ``unmerged``, ``changes``, ``untracked``, and ``stashed``.
     Empty dictionary by default, which means the default formats are used.
+
+:param tag_long_format:
+    Display the tag using the default describe long format, which includes number of commits and a revision number.
+    False by default, which means only the tag is displayed.
 
 Divider highlight group used: ``gitstatus:divider``.
 
