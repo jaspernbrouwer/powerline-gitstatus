@@ -123,7 +123,7 @@ Note: before v1.3.0, the behavior when the value is `True` was `last`. As of v1.
 
 Optionally the format in which Gitstatus shows information can be customized.
 This allows to use a different symbol or remove a fragment if desired. You can
-customize string formats for _tag_, _behind_, _ahead_, _staged_, _unmerged_,
+customize string formats for _branch_, _tag_, _behind_, _ahead_, _staged_, _unmerged_,
 _changed_, _untracked_ and _stash_ fragments with the following arguments in a
 theme configuration file, for example `.config/powerline/themes/shell/__main__.json`:
 
@@ -131,6 +131,7 @@ theme configuration file, for example `.config/powerline/themes/shell/__main__.j
 "gitstatus": {
     "args": { 
         "formats": {
+            "branch": "\ue0a0 {}",
             "tag": " {}",
             "behind": " {}",
             "ahead": " {}",
