@@ -132,14 +132,14 @@ theme configuration file, for example `.config/powerline/themes/shell/__main__.j
     "args": { 
         "formats": {
             "branch": "\ue0a0 {}",
-            "tag": " {}",
-            "behind": " {}",
-            "ahead": " {}",
-            "staged": " {}",
-            "unmerged": " {}",
-            "changed": " {}",
-            "untracked": " {}",
-            "stashed": " {}"
+            "tag": " ★ {}",
+            "behind": " ↓ {}",
+            "ahead": " ↑ {}",
+            "staged": " ● {}",
+            "unmerged": " ✖ {}",
+            "changed": " ✚ {}",
+            "untracked": " … {}",
+            "stashed": " ⚑ {}"
         }
     }
 }
