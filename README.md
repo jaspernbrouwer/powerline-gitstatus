@@ -104,10 +104,12 @@ Do this by passing `false` to the `use_dash_c` argument, for example in `.config
 
 Optionally, a tag description for the current branch may be displayed using the `show_tag` option. Valid values for this
 argument are:
+
  * `last` : shows the most recent tag
  * `annotated` : shows the most recent annotated tag
  * `contains` : shows the closest tag that comes after the current commit
  * `exact` : shows a tag only if it matches the current commit
+
 You can enable this by passing one of these to the `show_tag` argument, for example in `.config/powerline/themes/shell/__main__.json`:
 
 ```json
