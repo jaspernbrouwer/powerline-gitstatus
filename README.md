@@ -37,6 +37,8 @@ Installation
 
 ### On Debian/Ubuntu
 
+On a recent enough Debian (at least Stretch with backports enabled) or Ubuntu (at least 18.10) there is an official package available. 
+
 ```txt
 apt install powerline-gitstatus
 ```
