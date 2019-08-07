@@ -80,10 +80,10 @@ class GitStatusSegment(Segment):
 
         return (staged, unmerged, changed, untracked)
 
-    def build_segments(self, formats, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed):
+    def build_segments(self, formats, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed, untracked_not_dirty):
         if detached:
             branch_group = 'gitstatus_branch_detached'
-        elif staged or unmerged or changed or untracked:
+        elif staged or unmerged or changed or (untracked and not untracked_not_dirty):
             branch_group = 'gitstatus_branch_dirty'
         else:
             branch_group = 'gitstatus_branch_clean'
@@ -111,7 +111,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision'):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision', untracked_not_dirty=False):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -160,7 +160,7 @@ class GitStatusSegment(Segment):
         else:
             tag = tag[0]
 
-        return self.build_segments(formats, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed)
+        return self.build_segments(formats, branch, detached, tag, behind, ahead, staged, unmerged, changed, untracked, stashed, untracked_not_dirty)
 
 
 gitstatus = with_docstring(GitStatusSegment(),
@@ -188,6 +188,10 @@ if that number is greater than zero.
 :param detached_head_style:
     Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``ref``, which shows the closest reachable ref object.
     The default is ``revision``.
+
+:param untracked_not_dirty:
+    Untracked files alone will not mark the git branch status as dirty.
+    False by default.
 
 Divider highlight group used: ``gitstatus:divider``.
 
