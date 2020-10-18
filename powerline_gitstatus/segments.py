@@ -11,7 +11,7 @@ class GitStatusSegment(Segment):
 
     def execute(self, pl, command):
         pl.debug('Executing command: %s' % ' '.join(command))
-	
+
         git_env = os.environ.copy()
         git_env['LC_ALL'] = 'C' 
 
@@ -160,6 +160,8 @@ class GitStatusSegment(Segment):
 
         if err and ('error' in err[0] or 'fatal' in err[0] or 'Could not get sha1 for HEAD' in err[0]):
             tag = ''
+        elif tag == '':
+            tag = tag
         else:
             tag = tag[0]
 
