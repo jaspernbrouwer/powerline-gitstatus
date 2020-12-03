@@ -11,9 +11,9 @@ class GitStatusSegment(Segment):
 
     def execute(self, pl, command):
         pl.debug('Executing command: %s' % ' '.join(command))
-	
+
         git_env = os.environ.copy()
-        git_env['LC_ALL'] = 'C' 
+        git_env['LC_ALL'] = 'C'
 
         proc = Popen(command, stdout=PIPE, stderr=PIPE, env=git_env)
         out, err = [item.decode('utf-8') for item in proc.communicate()]
@@ -111,7 +111,7 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision'):
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision', skip_status=False):
         pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
 
         cwd = segment_info['getcwd']()
@@ -124,23 +124,33 @@ class GitStatusSegment(Segment):
         if not base:
             return
 
-        status, err = self.execute(pl, base + ['status', '--branch', '--porcelain'])
+        if skip_status:
+            status, err = self.execute(pl, base + ['rev-parse', '--abbrev-ref', 'HEAD'])
 
-        if err and ('error' in err[0] or 'fatal' in err[0]):
-            return
+            if err and ('error' in err[0] or 'fatal' in err[0]):
+                return
 
-        branch, detached, behind, ahead = self.parse_branch(status.pop(0))
+            branch = status[0]
+            detached, behind, ahead = False, 0, 0
+            staged, unmerged, changed, untracked = 0, 0, 0, 0
+        else:
+            status, err = self.execute(pl, base + ['status', '--branch', '--porcelain'])
 
-        if not branch:
-            return
+            if err and ('error' in err[0] or 'fatal' in err[0]):
+                return
 
-        if branch == 'HEAD':
-            if detached_head_style == 'revision':
-                branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
-            elif detached_head_style == 'ref':
-                branch = self.execute(pl, base + ['describe', '--contains', '--all'])[0][0]
+            branch, detached, behind, ahead = self.parse_branch(status.pop(0))
 
-        staged, unmerged, changed, untracked = self.parse_status(status)
+            if not branch:
+                return
+
+            if branch == 'HEAD':
+                if detached_head_style == 'revision':
+                    branch = self.execute(pl, base + ['rev-parse', '--short', 'HEAD'])[0][0]
+                elif detached_head_style == 'ref':
+                    branch = self.execute(pl, base + ['describe', '--contains', '--all'])[0][0]
+
+            staged, unmerged, changed, untracked = self.parse_status(status)
 
         stashed = len(self.execute(pl, base + ['stash', 'list', '--no-decorate'])[0])
 
@@ -188,6 +198,11 @@ if that number is greater than zero.
 :param detached_head_style:
     Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``ref``, which shows the closest reachable ref object.
     The default is ``revision``.
+
+:param bool skip_status:
+    Only show the current branch and stash information and skip getting the repo status.
+    This is useful in very large repos where ``git status --branch --porcelain`` takes a long time (>1s) to execute.
+    False by default.
 
 Divider highlight group used: ``gitstatus:divider``.
 

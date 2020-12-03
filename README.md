@@ -131,7 +131,7 @@ theme configuration file, for example `.config/powerline/themes/shell/__main__.j
 
 ```json
 "gitstatus": {
-    "args": { 
+    "args": {
         "formats": {
             "branch": "\ue0a0 {}",
             "tag": " ★ {}",
@@ -153,12 +153,25 @@ place of the branch name. This can be replaced with a description of the closest
 
 ```json
 "gitstatus": {
-    "args": { 
+    "args": {
         "detached_head_style": "ref"
     }
 }
 ```
- 
+
+In large repos (e.g. large monorepos) git status can take upwards of 40-50s to complete. Even with file watchers enabled
+like [watchman](https://github.com/facebook/watchman) the time to scan for file changes can take 1-2 seconds. To skip
+the full git status and only check for the current branch and stashes use the `skip-status` argument, for example in
+`.config/powerline/themes/shell/__main__.json`:
+
+```json
+"gitstatus": {
+    "args": {
+        "skip_status": true
+    }
+}
+```
+
 License
 -------
 
