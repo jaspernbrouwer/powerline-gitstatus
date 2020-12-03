@@ -199,6 +199,11 @@ if that number is greater than zero.
     Display style when in detached HEAD state. Valid values are ``revision``, which shows the current revision id, and ``ref``, which shows the closest reachable ref object.
     The default is ``revision``.
 
+:param bool skip_status:
+    Only show the current branch and stash information and skip getting the repo status.
+    This is useful in very large repos where ``git status --branch --porcelain`` takes a long time (>1s) to execute.
+    False by default.
+
 Divider highlight group used: ``gitstatus:divider``.
 
 Highlight groups used: ``gitstatus_branch_detached``, ``gitstatus_branch_dirty``, ``gitstatus_branch_clean``, ``gitstatus_branch``, ``gitstatus_tag``, ``gitstatus_behind``, ``gitstatus_ahead``, ``gitstatus_staged``, ``gitstatus_unmerged``, ``gitstatus_changed``, ``gitstatus_untracked``, ``gitstatus_stashed``, ``gitstatus``.
