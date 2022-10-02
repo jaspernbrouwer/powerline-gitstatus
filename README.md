@@ -160,6 +160,16 @@ place of the branch name. This can be replaced with a description of the closest
     }
 }
 ```
+
+By default, if your local branch has untracked files but no other changes, the branch status will be highlighted as dirty in the segment. You can disable this behavior by setting the `untracked_not_dirty` argument to `true`, for example in `.config/powerline/themes/shell/__main__.json`:
+
+```json
+"gitstatus": {
+    "args": {
+        "untracked_not_dirty": true
+    }
+}
+```
  
 License
 -------
