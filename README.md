@@ -104,6 +104,22 @@ Do this by passing `false` to the `use_dash_c` argument, for example in `.config
 }
 ```
 
+It's strongly recommended to define the `trusted_paths` argument. This will
+restrict the locations where git commands will be invoked, limiting the
+exposure to remote code execution via malicious repositories. Navigating the
+shell to repositories outside these trusted paths will not display the segment.
+
+```json
+"gitstatus": {
+    "args": {
+        "trusted_paths": [
+            "/home/foo/code",
+            "/home/foo/projects"
+        ]
+    }
+}
+```
+
 Optionally, a tag description for the current branch may be displayed using the `show_tag` option. Valid values for this
 argument are:
 

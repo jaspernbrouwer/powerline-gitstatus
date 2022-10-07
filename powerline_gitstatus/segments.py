@@ -3,6 +3,7 @@
 from powerline.segments import Segment, with_docstring
 from powerline.theme import requires_segment_info
 from subprocess import PIPE, Popen
+from pathlib import PurePath
 import os, re, string
 
 
@@ -25,15 +26,21 @@ class GitStatusSegment(Segment):
 
         return (out.splitlines(), err.splitlines())
 
-    def get_base_command(self, cwd, use_dash_c):
+    def get_base_command(self, cwd, use_dash_c, untrusted):
         if use_dash_c:
-            return ['git', '-C', cwd]
+            if untrusted:
+                return ['git', '-c', 'core.fsmonitor=', '-C', cwd]
+            else:
+                return ['git', '-C', cwd]
 
         while cwd and cwd != os.sep:
             gitdir = os.path.join(cwd, '.git')
 
             if os.path.isdir(gitdir):
-                return ['git', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
+                if untrusted:
+                    return ['git', '-c', 'core.fsmonitor=', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
+                else:
+                    return ['git', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
 
             cwd = os.path.dirname(cwd)
 
@@ -111,19 +118,32 @@ class GitStatusSegment(Segment):
 
         return segments
 
-    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision', untracked_not_dirty=False):
-        pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
+    def path_is_trusted(self, cwd, trusted_paths, pl):
+        for trusted_path in trusted_paths:
+            cwd_path = PurePath(cwd)
+            try:
+                cwd_path.relative_to(trusted_path)
+                return True
+            except ValueError:
+                pass
+        return False
 
+    def __call__(self, pl, segment_info, use_dash_c=True, show_tag=False, formats={}, detached_head_style='revision', untracked_not_dirty=False, trusted_paths=[]):
         cwd = segment_info['getcwd']()
 
         if not cwd:
             return
 
-        base = self.get_base_command(cwd, use_dash_c)
+        if trusted_paths and not self.path_is_trusted(cwd, trusted_paths, pl):
+            pl.debug("cwd not in trusted paths")
+            return
+
+        base = self.get_base_command(cwd, use_dash_c, trusted_paths is None)
 
         if not base:
             return
 
+        pl.debug('Running gitstatus %s -C' % ('with' if use_dash_c else 'without'))
         status, err = self.execute(pl, base + ['status', '--branch', '--porcelain'])
 
         if err and ('error' in err[0] or 'fatal' in err[0]):
