@@ -26,15 +26,21 @@ class GitStatusSegment(Segment):
 
         return (out.splitlines(), err.splitlines())
 
-    def get_base_command(self, cwd, use_dash_c):
+    def get_base_command(self, cwd, use_dash_c, untrusted):
         if use_dash_c:
-            return ['git', '-C', cwd]
+            if untrusted:
+                return ['git', '-c', 'core.fsmonitor=', '-C', cwd]
+            else:
+                return ['git', '-C', cwd]
 
         while cwd and cwd != os.sep:
             gitdir = os.path.join(cwd, '.git')
 
             if os.path.isdir(gitdir):
-                return ['git', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
+                if untrusted:
+                    return ['git', '-c', 'core.fsmonitor=', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
+                else:
+                    return ['git', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
 
             cwd = os.path.dirname(cwd)
 
@@ -132,7 +138,7 @@ class GitStatusSegment(Segment):
             pl.debug("cwd not in trusted paths")
             return
 
-        base = self.get_base_command(cwd, use_dash_c)
+        base = self.get_base_command(cwd, use_dash_c, trusted_paths is None)
 
         if not base:
             return
