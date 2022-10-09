@@ -27,13 +27,13 @@ class GitStatusSegment(Segment):
 
     def get_base_command(self, cwd, use_dash_c):
         if use_dash_c:
-            return ['git', '-C', cwd]
+            return ['git', '-c', 'core.fsmonitor=', '-C', cwd]
 
         while cwd and cwd != os.sep:
             gitdir = os.path.join(cwd, '.git')
 
             if os.path.isdir(gitdir):
-                return ['git', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
+                return ['git', '-c', 'core.fsmonitor=', '--git-dir=%s' % gitdir, '--work-tree=%s' % cwd]
 
             cwd = os.path.dirname(cwd)
 
