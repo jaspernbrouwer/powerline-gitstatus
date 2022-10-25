@@ -103,7 +103,7 @@ class GitStatusSegment(Segment):
         if unmerged:
             segments.append({'contents': formats.get('unmerged', ' ✖ {}').format(unmerged), 'highlight_groups': ['gitstatus_unmerged', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if changed:
-            segments.append({'contents': formats.get('changed', ' ✚ {}').format(changed), 'highlight_groups': ['gitstatus_changed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
+            segments.append({'contents': formats.get('changed', ' ✚ {} ' ).format(changed), 'highlight_groups': ['gitstatus_changed', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if untracked:
             segments.append({'contents': formats.get('untracked', ' … {}').format(untracked), 'highlight_groups': ['gitstatus_untracked', 'gitstatus'], 'divider_highlight_group': 'gitstatus:divider'})
         if stashed:
