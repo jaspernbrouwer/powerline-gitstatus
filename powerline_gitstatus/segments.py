@@ -46,25 +46,25 @@ class GitStatusSegment(Segment):
         if line.startswith('## '):
             line = line[3:]
 
-        match = re.search('^Initial commit on (.+)$', line)
+        match = re.search(r'^Initial commit on (.+)$', line)
         if match is not None:
             return (match.group(1), False, 0, 0)
 
-        match = re.search('^(.+) \(no branch\)$', line)
+        match = re.search(r'^(.+) \(no branch\)$', line)
         if match is not None:
             return (match.group(1), True, 0, 0)
 
-        match = re.search('^(.+?)\.\.\.', line)
+        match = re.search(r'^(.+?)\.\.\.', line)
         if match is not None:
             branch = match.group(1)
 
-            match = re.search('\[ahead (\d+), behind (\d+)\]$', line)
+            match = re.search(r'\[ahead (\d+), behind (\d+)\]$', line)
             if match is not None:
                 return (branch, False, int(match.group(2)), int(match.group(1)))
-            match = re.search('\[ahead (\d+)\]$', line)
+            match = re.search(r'\[ahead (\d+)\]$', line)
             if match is not None:
                 return (branch, False, 0, int(match.group(1)))
-            match = re.search('\[behind (\d+)\]$', line)
+            match = re.search(r'\[behind (\d+)\]$', line)
             if match is not None:
                 return (branch, False, int(match.group(1)), 0)
 
