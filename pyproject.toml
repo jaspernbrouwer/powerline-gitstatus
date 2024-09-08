@@ -11,6 +11,9 @@ license = {text = "MIT License"}
 authors = [
     {name = "Jasper N. Brouwer", email = "jasper@nerdsweide.nl"},
 ]
+maintainers = [
+    {name ="Jérôme Charaoui", email = "jerome@riseup.net"},
+]
 classifiers  = [
     "Development Status :: 6 - Mature",
     "Environment :: Console",
