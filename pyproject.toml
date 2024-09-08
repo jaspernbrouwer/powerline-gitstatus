@@ -21,3 +21,5 @@ classifiers  = [
 
 [project.urls]
 Homepage = "https://github.com/jaspernbrouwer/powerline-gitstatus"
+Repository = "https://github.com/jaspernbrouwer/powerline-gitstatus.git"
+Issues = "https://github.com/jaspernbrouwer/powerline-gitstatus"
