@@ -12,6 +12,7 @@ authors = [
     {name = "Jasper N. Brouwer", email = "jasper@nerdsweide.nl"},
 ]
 classifiers  = [
+    "Development Status :: 6 - Mature",
     "Environment :: Console",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
