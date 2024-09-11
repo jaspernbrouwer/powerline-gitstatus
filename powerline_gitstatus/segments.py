@@ -163,7 +163,10 @@ class GitStatusSegment(Segment):
         elif show_tag == 'contains':
             tag, err = self.execute(pl, base + ['describe', '--contains'])
         elif show_tag == 'last':
-            tag, err = self.execute(pl, base + ['describe', '--tags'])
+           tag = ''
+           hash, err = self.execute(pl, base + ['rev-list', '--tags', '--max-count=1'])
+           if not err and hash:
+               tag, err = self.execute(pl, base + ['describe', '--tags', hash[0]])
         elif show_tag == 'annotated':
             tag, err = self.execute(pl, base + ['describe'])
         else:
@@ -171,6 +174,8 @@ class GitStatusSegment(Segment):
 
         if err and ('error' in err[0] or 'fatal' in err[0] or 'Could not get sha1 for HEAD' in err[0]):
             tag = ''
+        elif tag == '':
+            tag = tag
         else:
             tag = tag[0]
 
