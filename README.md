@@ -54,6 +54,17 @@ shell theme.
 pip install powerline-gitstatus
 ```
 
+### Manual installation
+1. Put powerline_gitstatus folder to ```$powerline_root/powerline/segments```
+2. Add the following segment to your powerline config file, e.g. `.config/powerline/themes/shell/default.json`
+```json
+{
+    "function": "powerline.segments.powerline_gitstatus.segments.gitstatus",
+    "priority": 40
+}
+```
+
+
 Configuration
 -------------
 
